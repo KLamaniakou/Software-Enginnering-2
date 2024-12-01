@@ -12,7 +12,7 @@ import lombok.ToString;
 
 @Entity
 @Table(name="book_authors")
-@Getter @Setter @NoArgsConstructor @RequiredArgsConstructor @ToString
+@Getter @Setter @ToString
 public class BookAuthor {
 	
 	@Id

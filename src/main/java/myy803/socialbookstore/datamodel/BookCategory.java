@@ -12,7 +12,7 @@ import lombok.ToString;
 
 @Entity
 @Table(name="book_categories")
-@Getter @Setter @NoArgsConstructor @RequiredArgsConstructor @ToString
+@Getter @Setter @ToString
 public class BookCategory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
