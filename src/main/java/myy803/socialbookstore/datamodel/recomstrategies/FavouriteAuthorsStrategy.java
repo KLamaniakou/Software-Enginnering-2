@@ -10,20 +10,15 @@ import myy803.socialbookstore.formsdata.BookDto;
 import myy803.socialbookstore.mappers.UserProfileMapper;
 
 @Component
-public class FavouriteAuthorsStrategy implements RecommendationsStrategy {
-	
-	@Autowired
-	private UserProfileMapper userProfileMapper;
+public class FavouriteAuthorsStrategy extends RecommendationsStrategyTemplate {
 
-	public List<BookDto> recommend(String username) {
-		UserProfile userProfile = userProfileMapper.findByUsername(username);
-		List<BookDto> bookDtos = retrieveRecommendedBooks(userProfile);
-	
-		return bookDtos;
+	// Constructor to inject the UserProfileMapper
+	public FavouriteAuthorsStrategy(UserProfileMapper userProfileMapper) {
+		super(userProfileMapper);
 	}
-	
+
+	@Override
 	protected List<BookDto> retrieveRecommendedBooks(UserProfile userProfile) {
-		List<BookDto> bookDtos = userProfile.getBooksFromFavouriteAuthors();
-		return bookDtos;
+		return userProfile.getBooksFromFavouriteAuthors(); // Fetch books from the user's favourite authors
 	}
 }
