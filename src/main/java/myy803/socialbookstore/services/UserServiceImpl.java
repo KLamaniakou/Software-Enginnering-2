@@ -1,7 +1,14 @@
 package myy803.socialbookstore.services;
 
+import java.util.List;
 import java.util.Optional;
 
+import myy803.socialbookstore.datamodel.BookCategory;
+import myy803.socialbookstore.datamodel.UserProfile;
+import myy803.socialbookstore.formsdata.UserProfileDto;
+import myy803.socialbookstore.mappers.BookAuthorMapper;
+import myy803.socialbookstore.mappers.BookCategoryMapper;
+import myy803.socialbookstore.mappers.UserProfileMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import myy803.socialbookstore.datamodel.User;
 import myy803.socialbookstore.mappers.UserMapper;
+import org.springframework.ui.Model;
 
 
 @Service
@@ -21,7 +29,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	
 	@Autowired
 	private UserMapper userMapper;
-	
+	@Autowired
+	BookCategoryMapper bookCategoryMapper;
+	@Autowired
+	private UserProfileMapper userProfileMapper;
+	@Autowired
+	private BookAuthorMapper bookAuthorMapper;
+	@Autowired
+	private BookCategoryMapper bookCategoriesMapper;
+
 	@Override
 	public void saveUser(User user) {
 		String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
@@ -48,6 +64,41 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 ()-> new UsernameNotFoundException(
                         String.format("USER_NOT_FOUND", username)
                 ));
+	}
+
+	@Override
+	public void retrieveProfile(String username, Model model) {
+
+		List<BookCategory> categories = bookCategoryMapper.findAll();
+		model.addAttribute("categories", categories);
+
+		Optional<UserProfile> optUserProfile = userProfileMapper.findById(username);
+		UserProfile userProfile = null;
+		UserProfileDto userProfileDto = null;
+		if(optUserProfile.isPresent()) {
+			userProfile = optUserProfile.get();
+			userProfileDto = userProfile.buildProfileDto();
+		} else {
+			userProfileDto = new UserProfileDto();
+			userProfileDto.setUsername(username);
+		}
+
+		model.addAttribute("profile", userProfileDto);
+	}
+
+	@Override
+	public void saveProfile(UserProfileDto userProfileDto) {
+
+		Optional<UserProfile> optUserProfile = userProfileMapper.findById(userProfileDto.getUsername());
+		UserProfile userProfile = null;
+		if(optUserProfile.isPresent())
+			userProfile = optUserProfile.get();
+		else
+			userProfile = new UserProfile();
+
+		userProfileDto.buildUserProfile(userProfile, bookAuthorMapper, bookCategoriesMapper);
+
+		userProfileMapper.save(userProfile);
 	}
 
 }
