@@ -12,40 +12,16 @@ import myy803.socialbookstore.formsdata.SearchDto;
 import myy803.socialbookstore.mappers.BookMapper;
 
 @Component
-public class ExactSearchStrategy implements SearchStrategy {
+public class ExactSearchStrategy extends SearchStrategyTemplate {
 
-	@Autowired
-	protected BookMapper bookMapper;
-	
-	public ArrayList<BookDto> search(SearchDto searchDto, BookMapper bookMapper) {
-		ArrayList<BookDto> bookDtos = new ArrayList<BookDto>();
-		
-		if(searchDto.getTitle() != null) {
-			List<Book> books = makeInitialListOfBooks(searchDto);
-			
-			boolean authorsMatch = true;
-			
-			for(Book book : books) {
-				if(!searchDto.getAuthors().equals("")) {
-					authorsMatch = checkIfAuthorsMatch(searchDto, book);
-				}
-				if(authorsMatch) bookDtos.add(book.buildDto());
-			}
-		}
-		
-		return bookDtos;
+	public ExactSearchStrategy(BookMapper bookMapper) {
+		super(bookMapper);
 	}
-	
-	
-	protected List<Book> makeInitialListOfBooks(SearchDto searchDto) {
-		List<Book> books = bookMapper.findByTitle(searchDto.getTitle());
-		return books;
-	}
-	
-	
+
+	// Implement the exact author matching logic
+	@Override
 	protected boolean checkIfAuthorsMatch(SearchDto searchDto, Book book) {
-		boolean authorsMatch;
-		authorsMatch = book.writtenBy(searchDto.getAuthors());
-		return authorsMatch;
+		// Perform exact author match logic
+		return book.writtenBy(searchDto.getAuthors());  // Exact match for authors
 	}
 }
